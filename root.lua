@@ -12,6 +12,10 @@ BUSRIDE = BUSRIDE or {
     },
     hookedFns = {
 
+    },
+    routines = {},
+    op = {
+        STILL_WORKING = {1}
     }
 }
 
@@ -202,5 +206,148 @@ function BUSRIDE.check(fn)
     return false
 end
 
+--- Runs a function asynchronously. This allows for the use of certain functions like `BUSRIDE.wait` and `BUSRIDE.awaitTask`.
+---@param fn async fun(...)
+---@param ... any Initial thread/routine arguments
+---@return thread
+function BUSRIDE.runAsync(fn, ...)
+    local co = coroutine.create(fn)
+    local ok, wait = coroutine.resume(co, ...)
+    if ok and coroutine.status(co) ~= "dead" then
+        BUSRIDE.routines[co] = wait
+    end
+    return co
+end
+
+--- Works like `BUSRIDE.runAsync`, but runs a function afterwards that takes in the task's return values.
+---@generic T
+---@param fn async fun(...): `T`
+---@param onComplete fun(T)
+---@param ... any Initial thread/routine arguments
+---@return thread
+function BUSRIDE.runAsyncTask(fn, onComplete, ...)
+    local co = coroutine.create(fn)
+    local ok, wait = coroutine.resume(co, ...)
+    if ok and coroutine.status(co) ~= "dead" then
+        BUSRIDE.routines[co] = {wait=wait,onComplete=onComplete}
+    end
+    return co
+end
+
+--- Pauses the current thread until the specified amount of time has passed.
+--- ! Note: Wait time is not exact. Thread resumes on the next frame.
+---@async
+---@return true
+function BUSRIDE.wait(ms)
+    if not coroutine.running() then return end
+    local target = love.timer.getTime() + (ms/1000)
+    return coroutine.yield(function()
+        return love.timer.getTime() >= target or BUSRIDE.op.STILL_WORKING
+    end)
+end
+
+--- Runs a task asynchronously, resuming the current thread/coroutine after finishing.
+---@async
+---@param task async fun(...): ...
+---@return ...
+function BUSRIDE.awaitTask(task, ...)
+    if not coroutine.running() then return end
+    local todo = coroutine.create(task)
+
+    local res = {coroutine.resume(todo)}
+    if coroutine.status(todo) == "dead" then table.remove(res,1) return res end
+    local wait = res[2]
+    return coroutine.yield(function()
+        if type(wait) == "function" then
+            res = {wait()}
+            if res[1] ~= BUSRIDE.op.STILL_WORKING then
+                local ok, newwait = coroutine.resume(todo, unpack(res))
+                if not ok or coroutine.status(todo) == "dead" then
+                    return res and unpack(res)
+                else
+                    wait = newwait
+                    return BUSRIDE.op.STILL_WORKING
+                end
+            else
+                return BUSRIDE.op.STILL_WORKING
+            end
+        else
+            res = {coroutine.resume(todo)}
+            if coroutine.status(todo) == "dead" then
+                table.remove(res, 1)
+                return res and unpack(res)
+            else
+                wait = res[2]
+                return BUSRIDE.op.STILL_WORKING
+            end
+        end
+    end)
+end
+
+---@private
+function BUSRIDE.updateCoroutines()
+    for co, wait in pairs(BUSRIDE.routines) do
+        if type(wait) == "function" then
+            local res = {wait()}
+            if res[1] ~= BUSRIDE.op.STILL_WORKING then
+                local ok, newwait = coroutine.resume(co, unpack(res))
+                if not ok or coroutine.status(co) == "dead" then
+                    BUSRIDE.routines[co] = nil
+                else
+                    BUSRIDE.routines[co] = newwait
+                end
+            end
+        elseif type(wait) == "table" then
+            if wait.wait then
+                local res = {wait.wait()}
+                if res[1] ~= BUSRIDE.op.STILL_WORKING then
+                    local res = {coroutine.resume(co, unpack(res))}
+                    if not res[1] or coroutine.status(co) == "dead" then
+                        BUSRIDE.routines[co] = nil
+                        table.remove(res,1)
+                        wait.onComplete(unpack(res))
+                    else
+                        BUSRIDE.routines[co].wait = res[2]
+                    end
+                end
+            else
+                BUSRIDE.routines[co] = nil
+                wait.onComplete()
+            end
+        end
+    end
+end
+
 SMODS.load_file("hooks/love.lua")()
 SMODS.load_file("hooks/balatro.lua")()
+
+BUSRIDE.on('love.update#post', function()
+    BUSRIDE.updateCoroutines()
+end)
+
+BUSRIDE.runAsync(function()
+    local t = love.timer.getTime()
+    for i = 1, 50 do
+        BUSRIDE.wait(100)
+        print("BUSRIDE: ".. i/10 .." seconds have passed!")
+    end
+    print("short wait",love.timer.getTime() - t)
+    BUSRIDE.awaitTask(function (...)
+        BUSRIDE.wait(5000)
+        print("waiting finished")
+        BUSRIDE.awaitTask(function (...)
+            BUSRIDE.wait(5000)
+            print("i heard you liked waiting, so i")
+        end)
+    end)
+    print("awaitTask cleared!")
+end)
+
+BUSRIDE.runAsyncTask(function()
+    local t = love.timer.getTime()
+    BUSRIDE.wait(10000)
+    print("long wait",love.timer.getTime() - t)
+    return "pink"
+end, function(result)
+    print(result)
+end)

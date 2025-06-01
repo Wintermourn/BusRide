@@ -1,11 +1,13 @@
 # Event Bus Ride
 Provides an event bus system to Love and Balatro specific functions.
+Also provides async task support!
 
 ## Installation
 This system is a mod for *Balatro* and requires *Steamodded* to run.
 Simply place into your mods folder and it should work fine.
 
 ## Usage
+### Event Bus
 `BUSRIDE.on(eventName, fun(...): (...), order: integer?)`
 - Activates whenever event is fired
 - Arguments depend on the event
@@ -24,7 +26,7 @@ Simply place into your mods folder and it should work fine.
 `BUSRIDE.fire(eventName, ...): boolean`
 - Fires an event, activating all subscribers. Returns a boolean for cancelling purposes
 
-`BUSRIDE.hookFunction(name, table, key)`
+`BUSRIDE.hookFunction(name: string, table: table, key: string)`
 - Hooks onto a function, providing `[name]#pre`, `[name]`, and `[name]#post` events.
 
 `BUSRIDE.skipHook(fun(...): (...), ...)`
@@ -33,13 +35,49 @@ Simply place into your mods folder and it should work fine.
 `BUSRIDE.skipAnyHooks(fun(...): (...), ...)`
 - Ignores all consecutive layers of Bus Ride hooks on the function
 
-`BUSRIDE.check(fun(...): (...), ...)`
+`BUSRIDE.check(fun(...): (...)): boolean`
 - Checks if a function is a Bus Ride hook.
+### Async
+`BUSRIDE.runAsync(fun(...): (...), ...): coroutine`
+- Runs the provided function as a coroutine. This allows it to span for multiple frames, given that it yields (see `BUSRIDE.wait` and `BUSRIDE.awaitTask`)
+- `...` is any number of arguments. They are passed to the routine on startup.
+
+`BUSRIDE.runAsyncTask(fun(...): T, fun(T), ...): coroutine`
+- Runs the former function as a coroutine (see `BUSRIDE.runAsync`). When it finishes, its return values are passed to the latter function.
+- `...` is any number of arguments. They are passed to the routine on startup.
+
+async `BUSRIDE.wait(ms: number)`
+- Pauses the current task for a specified amount of time, resuming the task **on the next frame**.
+
+async `BUSRIDE.awaitTask(fun(...): T, ...): T`
+- Pauses the current task while another one runs, returning its results to the current routine.
+- `...` is any number of arguments. They are passed to the routine on startup.
 
 ## Examples
+### Event Bus
 ```lua
 BUSRIDE.on("G.main_menu", function (args)
     return false -- blocks the main menu from ever opening
+end)
+```
+### Async
+```lua
+BUSRIDE.runAsync(function()
+    local t = love.timer.getTime()
+    for i = 1, 50 do
+        BUSRIDE.wait(100)
+        print("BUSRIDE: ".. i/10 .." (estimated) seconds have passed!")
+    end
+    print("actual wait time: ", love.timer.getTime() - t)
+    BUSRIDE.awaitTask(function (...)
+        BUSRIDE.wait(5000)
+        print("waiting finished")
+        BUSRIDE.awaitTask(function (...)
+            BUSRIDE.wait(5000)
+            print("i heard you liked waiting, so i")
+        end)
+    end)
+    print("awaitTask cleared!")
 end)
 ```
 

@@ -4,7 +4,7 @@
     "name": "Event Bus Ride",
     "display_name": "Bus Ride",
     "author": ["Wintermourn"],
-    "description": "Adds event bus capabilities to many functions.",
+    "description": "Adds event bus and async task systems for mod developers.",
     "main_file": "root.lua",
     "version": "0.1.0",
     "priority": 10,
