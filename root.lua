@@ -58,7 +58,7 @@ BUSRIDE = BUSRIDE or {
 ---@return integer subscribers the new count of event subscribers.
 ---@overload fun(event: busride.defaults, fn: fun(args: any[]), order: integer?): integer
 ---@overload fun(event: busride.defaults.cancellable, fn: fun(args: any[]): (boolean?), order: integer?): integer
----@overload fun(event: busride.defaults.post, fn: fun(args: any[], returnValues: any[]?), order: integer?): integer
+---@overload fun(event: busride.defaults.post, fn: fun(args: any[], returnValues: any[]?, wasCancelled: boolean), order: integer?): integer
 function BUSRIDE.on(event, fn, order)
     if BUSRIDE.callbacks.on[event] == nil then
         BUSRIDE.callbacks.on[event] = {
@@ -157,10 +157,10 @@ function BUSRIDE.hookFunction(eventName, table, key, ...)
         local ret
         if BUSRIDE.fire(eventName, {...}) then
             ret = {og(...)}
-            BUSRIDE.fire(eventName.."#post", {...}, ret)
+            BUSRIDE.fire(eventName.."#post", {...}, ret, false)
             return unpack(ret)
         else
-            BUSRIDE.fire(eventName.."#post", {...})
+            BUSRIDE.fire(eventName.."#post", {...}, nil, true)
             return unpack(defret)
         end
     end
