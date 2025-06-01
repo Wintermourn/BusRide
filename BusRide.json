@@ -6,7 +6,7 @@
     "author": ["Wintermourn"],
     "description": "Adds event bus capabilities to many functions.",
     "main_file": "root.lua",
-    "version": "0.0.0~dev",
+    "version": "0.1.0",
     "priority": 10,
     "dependencies": [
         "Steamodded (>=1.0.0~ALPHA-1206c)",

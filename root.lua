@@ -18,12 +18,24 @@ BUSRIDE = BUSRIDE or {
 ---@alias busride.defaults
 ---| 'G.main_menu#pre' Balatro
 ---| 'love.mousemoved#pre' Internal
+---| 'love.mousepressed#pre' Internal
+---| 'love.mousereleased#pre' Internal
+---| 'love.keypressed#pre' Internal
+---| 'love.keyreleased#pre' Internal
+---| 'love.gamepadpressed#pre' Internal
+---| 'love.gamepadreleased#pre' Internal
 ---| 'love.update#pre' Internal
 ---| 'love.draw#pre' Internal
 
 ---@alias busride.defaults.cancellable
 ---| 'G.main_menu' Cancellable | Balatro
 ---| 'love.mousemoved' Cancellable | Internal
+---| 'love.mousepressed' Cancellable | Internal
+---| 'love.mousereleased' Cancellable | Internal
+---| 'love.keypressed' Cancellable | Internal
+---| 'love.keyreleased' Cancellable | Internal
+---| 'love.gamepadpressed' Cancellable | Internal
+---| 'love.gamepadreleased' Cancellable | Internal
 ---| 'love.update' Cancellable | Internal
 ---| 'love.draw' Cancellable | Internal
 
@@ -32,6 +44,12 @@ BUSRIDE = BUSRIDE or {
 ---| 'love.mousemoved#post' Internal
 ---| 'love.update#post' Internal
 ---| 'love.draw#post' Internal
+---| 'love.mousepressed#post' Internal
+---| 'love.mousereleased#post' Internal
+---| 'love.keypressed#post' Internal
+---| 'love.keyreleased#post' Internal
+---| 'love.gamepadpressed#post' Internal
+---| 'love.gamepadreleased#post' Internal
 
 --- Subscribes to an event.
 ---@param event string The event being subscribed to.
@@ -57,6 +75,9 @@ function BUSRIDE.on(event, fn, order)
     end
 end
 
+--- Unsubscribe from an event.
+---@param event string
+---@param fn function
 function BUSRIDE.removeOn(event, fn)
     if BUSRIDE.callbacks.on[event] == nil then return end
     for i,k in ipairs(BUSRIDE.callbacks.on[event]) do
@@ -88,6 +109,9 @@ function BUSRIDE.once(event, fn, order)
     end
 end
 
+--- Unsubscribe from an event. Note that this won't work if the hooked function has already fired and forgotten the subscriber.
+---@param event string
+---@param fn function
 function BUSRIDE.removeOnce(event, fn)
     if BUSRIDE.callbacks.once[event] == nil then return end
     for i,k in ipairs(BUSRIDE.callbacks.once[event]) do
