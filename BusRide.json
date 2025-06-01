@@ -1,0 +1,17 @@
+{
+    "id": "EventBusRide",
+    "prefix": "eventbusride",
+    "name": "Event Bus Ride",
+    "display_name": "Bus Ride",
+    "author": ["Wintermourn"],
+    "description": "Adds event bus capabilities to many functions.",
+    "main_file": "root.lua",
+    "version": "0.0.0~dev",
+    "priority": 10,
+    "dependencies": [
+        "Steamodded (>=1.0.0~ALPHA-1206c)",
+        "Lovely (>=0.6.0)"
+    ],
+
+    "badge_color": "ffff66"
+}

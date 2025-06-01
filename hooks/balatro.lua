@@ -1,0 +1,1 @@
+BUSRIDE.hookFunction("G.main_menu", G, "main_menu")
