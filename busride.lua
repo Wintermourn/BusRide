@@ -4,7 +4,7 @@ if pathOverride ~= '' and pathOverride:sub(-1) ~= '/' then
     pathOverride = pathOverride ..'/'
 end
 
-local __VERSION = setmetatable({major=0,minor=3,patch=1}, {
+local __VERSION = setmetatable({major=0,minor=3,patch=2}, {
     __tostring = function(t)
         return t.major ..'.'.. t.minor ..'.'.. t.patch
     end
@@ -344,9 +344,10 @@ function _BUSRIDE.awaitTask(task, ...)
         if type(wait) == "function" then
             res = {wait()}
             if res[1] ~= _BUSRIDE.op.STILL_WORKING then
-                local ok, newwait = coroutine.resume(todo, unpack(res))
-                if not ok or coroutine.status(todo) == "dead" then
-                    return res and unpack(res)
+                res = {coroutine.resume(todo, unpack(res))}
+                if not res[1] or coroutine.status(todo) == "dead" then
+                    table.remove(res, 1)
+                    return unpack(res)
                 else
                     wait = newwait
                     return _BUSRIDE.op.STILL_WORKING
@@ -358,7 +359,7 @@ function _BUSRIDE.awaitTask(task, ...)
             res = {coroutine.resume(todo)}
             if coroutine.status(todo) == "dead" then
                 table.remove(res, 1)
-                return res and unpack(res)
+                return unpack(res)
             else
                 wait = res[2]
                 return _BUSRIDE.op.STILL_WORKING
