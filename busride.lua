@@ -386,7 +386,7 @@ BUSRIDE.on("EventManager.clear_queue", function (args)
     local eventManager = args[1]
     ---@cast eventManager EventManager
     if not args[2] then -- queue
-        for k, q in pairs(eventManager.queues) do
+        for _k, q in pairs(eventManager.queues) do
             local i = 1
             local e
             while i <= #q do
@@ -424,3 +424,5 @@ BUSRIDE.on("EventManager.clear_queue", function (args)
         end
     end
 end)
+
+return _BUSRIDE
