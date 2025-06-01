@@ -1,1 +1,1 @@
-BUSRIDE.hookFunction("G.main_menu", G, "main_menu")
+BUSRIDE.hookFunction("G.main_menu", Game, "main_menu")
