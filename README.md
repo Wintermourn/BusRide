@@ -5,6 +5,7 @@ Also provides async task support!
 ## Installation
 This system is a mod for *Balatro* and requires *Steamodded* to run.
 Simply place into your mods folder and it should work fine.
+
 Alternatively, if you want to pack this mod in with yours as a library, that's also possible! Just run `SMODS.load_file("path/to/busride.lua")("path/to/busride/")` and it will automatically load.
 
 ## Usage
