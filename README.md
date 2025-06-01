@@ -5,6 +5,7 @@ Also provides async task support!
 ## Installation
 This system is a mod for *Balatro* and requires *Steamodded* to run.
 Simply place into your mods folder and it should work fine.
+Alternatively, if you want to pack this mod in with yours as a library, that's also possible! Just run `SMODS.load_file("path/to/busride.lua")("path/to/busride/")` and it will automatically load.
 
 ## Usage
 ### Event Bus
@@ -38,13 +39,16 @@ Simply place into your mods folder and it should work fine.
 `BUSRIDE.check(fun(...): (...)): boolean`
 - Checks if a function is a Bus Ride hook.
 ### Async
-`BUSRIDE.runAsync(fun(...): (...), ...): coroutine`
+`BUSRIDE.runAsync(fun(...): (...), ...): Balatro Event`
 - Runs the provided function as a coroutine. This allows it to span for multiple frames, given that it yields (see `BUSRIDE.wait` and `BUSRIDE.awaitTask`)
 - `...` is any number of arguments. They are passed to the routine on startup.
 
-`BUSRIDE.runAsyncTask(fun(...): T, fun(T), ...): coroutine`
+`BUSRIDE.runAsyncTask(fun(...): T, fun(T), ...): Balatro Event`
 - Runs the former function as a coroutine (see `BUSRIDE.runAsync`). When it finishes, its return values are passed to the latter function.
 - `...` is any number of arguments. They are passed to the routine on startup.
+
+`BUSRIDE.runBalatroEvent(fun(...), eventArgs: table, ...): Balatro Event`
+- Allows providing specific settings to the event (see [SMODS Docs](https://github.com/Steamodded/smods/wiki/Guide-%E2%80%90-Event-Manager))
 
 async `BUSRIDE.wait(ms: number)`
 - Pauses the current task for a specified amount of time, resuming the task **on the next frame**.
@@ -100,3 +104,4 @@ This means you have:
 - `love.gamepadreleased`
 ### Balatro
 - `G.main_menu`
+- `EventManager.clear_queue`

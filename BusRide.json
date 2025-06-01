@@ -5,8 +5,8 @@
     "display_name": "Bus Ride",
     "author": ["Wintermourn"],
     "description": "Adds event bus and async task systems for mod developers.",
-    "main_file": "root.lua",
-    "version": "0.1.0",
+    "main_file": "busride.lua",
+    "version": "0.3.0",
     "priority": 10,
     "dependencies": [
         "Steamodded (>=1.0.0~ALPHA-1206c)",
