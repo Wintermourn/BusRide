@@ -4,7 +4,7 @@ if pathOverride ~= '' and pathOverride:sub(-1) ~= '/' then
     pathOverride = pathOverride ..'/'
 end
 
-local __VERSION = setmetatable({major=0,minor=3,patch=0}, {
+local __VERSION = setmetatable({major=0,minor=3,patch=1}, {
     __tostring = function(t)
         return t.major ..'.'.. t.minor ..'.'.. t.patch
     end
@@ -375,8 +375,12 @@ if isNewerVersion then
 end
 BUSRIDE = _BUSRIDE
 
-SMODS.load_file(pathOverride .. "hooks/love.lua")()
-SMODS.load_file(pathOverride .. "hooks/balatro.lua")()
+local function loadHookFile(path)
+    local file = SMODS.load_file(path)
+    if file then file() end
+end
+loadHookFile(pathOverride .. "hooks/love.lua")
+loadHookFile(pathOverride .. "hooks/balatro.lua")
 
 BUSRIDE.on("EventManager.clear_queue", function (args)
     local eventManager = args[1]
