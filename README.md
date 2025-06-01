@@ -10,21 +10,29 @@ Simply place into your mods folder and it should work fine.
 - Activates whenever event is fired
 - Arguments depend on the event
 - Return values depend on event
+
 `BUSRIDE.once(eventName, fun(...): (...), order: integer?)`
 - Activates only once when event is fired
 - Arguments depend on the event
 - Return values depend on event
+
 `BUSRIDE.removeOn(eventName, fun(...): (...))`
+
 `BUSRIDE.removeOnce(eventName, fun(...): (...))`
 - Removes an identical subscriber from the event bus
+
 `BUSRIDE.fire(eventName, ...): boolean`
 - Fires an event, activating all subscribers. Returns a boolean for cancelling purposes
+
 `BUSRIDE.hookFunction(name, table, key)`
 - Hooks onto a function, providing `[name]#pre`, `[name]`, and `[name]#post` events.
+
 `BUSRIDE.skipHook(fun(...): (...), ...)`
 - Ignores a layer of Bus Ride hooks on the function
+
 `BUSRIDE.skipAnyHooks(fun(...): (...), ...)`
 - Ignores all consecutive layers of Bus Ride hooks on the function
+
 `BUSRIDE.check(fun(...): (...), ...)`
 - Checks if a function is a Bus Ride hook.
 
