@@ -4,7 +4,7 @@ if pathOverride ~= '' and pathOverride:sub(-1) ~= '/' then
     pathOverride = pathOverride ..'/'
 end
 
-local __VERSION = setmetatable({major=0,minor=4,patch=2}, {
+local __VERSION = setmetatable({major=0,minor=4,patch=3}, {
     __tostring = function(t)
         return t.major ..'.'.. t.minor ..'.'.. t.patch
     end
@@ -323,12 +323,13 @@ end
 --- Pauses the current thread until the specified amount of time has passed.
 --- ! Note: Wait time is not exact. Thread resumes on the next frame.
 ---@async
----@return true
+---@param ms number The minimum length of time to wait, in milliseconds.
+---@return number actualWaitTime
 function _BUSRIDE.wait(ms)
     if not coroutine.running() then return end
-    ms = ms or 0
+    ms = ms or 1
     local now = love.timer.getTime()
-    local target = love.timer.getTime() + (ms/1000)
+    local target = now + (ms/1000)
     return coroutine.yield(function()
         return love.timer.getTime() >= target and love.timer.getTime() - now or _BUSRIDE.op.STILL_WORKING
     end)

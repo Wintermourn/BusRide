@@ -51,8 +51,9 @@ Alternatively, if you want to pack this mod in with yours as a library, that's a
 `BUSRIDE.runBalatroEvent(fun(...), eventArgs: table, ...): Balatro Event`
 - Allows providing specific settings to the event (see [SMODS Docs](https://github.com/Steamodded/smods/wiki/Guide-%E2%80%90-Event-Manager))
 
-async `BUSRIDE.wait(ms: number)`
+async `BUSRIDE.wait(ms: number): number`
 - Pauses the current task for a specified amount of time, resuming the task **on the next frame**.
+- Returns the real wait time
 
 async `BUSRIDE.awaitTask(fun(...): T, ...): T`
 - Pauses the current task while another one runs, returning its results to the current routine.
@@ -105,4 +106,5 @@ This means you have:
 - `love.gamepadreleased`
 ### Balatro
 - `G.main_menu`
+- `UIBox.draw`
 - `EventManager.clear_queue`
