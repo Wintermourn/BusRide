@@ -4,7 +4,7 @@ if pathOverride ~= '' and pathOverride:sub(-1) ~= '/' then
     pathOverride = pathOverride ..'/'
 end
 
-local __VERSION = setmetatable({major=0,minor=4,patch=0}, {
+local __VERSION = setmetatable({major=0,minor=4,patch=1}, {
     __tostring = function(t)
         return t.major ..'.'.. t.minor ..'.'.. t.patch
     end
@@ -326,9 +326,10 @@ end
 ---@return true
 function _BUSRIDE.wait(ms)
     if not coroutine.running() then return end
+    local now = love.timer.getTime()
     local target = love.timer.getTime() + (ms/1000)
     return coroutine.yield(function()
-        return love.timer.getTime() >= target and love.timer.getTime() - target or _BUSRIDE.op.STILL_WORKING
+        return love.timer.getTime() >= target and love.timer.getTime() - now or _BUSRIDE.op.STILL_WORKING
     end)
 end
 
