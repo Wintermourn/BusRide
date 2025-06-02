@@ -4,7 +4,7 @@ if pathOverride ~= '' and pathOverride:sub(-1) ~= '/' then
     pathOverride = pathOverride ..'/'
 end
 
-local __VERSION = setmetatable({major=0,minor=3,patch=2}, {
+local __VERSION = setmetatable({major=0,minor=4,patch=0}, {
     __tostring = function(t)
         return t.major ..'.'.. t.minor ..'.'.. t.patch
     end
@@ -28,7 +28,7 @@ local isFirstInit = BUSRIDE == nil
 local isNewerVersion = not isFirstInit and testVersion(__VERSION, BUSRIDE._VERSION) > 0
 local isIndividual = SMODS.current_mod.id == "EventBusRide"
 
-if not isFirstInit and not isNewerVersion then
+if not isFirstInit and not isNewerVersion and not isIndividual then
     print(string.format(
         "[BusRide] version packaged in %s is not up to date (%s vs loaded %s)", SMODS.current_mod.id, tostring(__VERSION), tostring(BUSRIDE._VERSION)))
     return
@@ -58,6 +58,7 @@ if isIndividual then
 end
 
 ---@alias busride.defaults
+---| 'UIBox.draw#pre' Balatro
 ---| 'G.main_menu#pre' Balatro
 ---| 'EventManager.clear_queue#pre' Balatro
 ---| 'love.mousemoved#pre' Internal
@@ -71,6 +72,7 @@ end
 ---| 'love.draw#pre' Internal
 
 ---@alias busride.defaults.cancellable
+---| 'UIBox.draw' Cancellable | Balatro
 ---| 'G.main_menu' Cancellable | Balatro
 ---| 'EventManager.clear_queue' Cancellable | Balatro
 ---| 'love.mousemoved' Cancellable | Internal
@@ -84,6 +86,7 @@ end
 ---| 'love.draw' Cancellable | Internal
 
 ---@alias busride.defaults.post
+---| 'UIBox.draw#post' Balatro
 ---| 'G.main_menu#post' Balatro
 ---| 'EventManager.clear_queue#post' Balatro
 ---| 'love.mousemoved#post' Internal
@@ -325,7 +328,7 @@ function _BUSRIDE.wait(ms)
     if not coroutine.running() then return end
     local target = love.timer.getTime() + (ms/1000)
     return coroutine.yield(function()
-        return love.timer.getTime() >= target or _BUSRIDE.op.STILL_WORKING
+        return love.timer.getTime() >= target and love.timer.getTime() - target or _BUSRIDE.op.STILL_WORKING
     end)
 end
 
@@ -349,7 +352,7 @@ function _BUSRIDE.awaitTask(task, ...)
                     table.remove(res, 1)
                     return unpack(res)
                 else
-                    wait = newwait
+                    wait = res[2]
                     return _BUSRIDE.op.STILL_WORKING
                 end
             else
